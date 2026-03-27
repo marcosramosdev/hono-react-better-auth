@@ -1,7 +1,8 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-const pool = new Pool({
+export const pool = new Pool({
+	// biome-ignore lint/style/noNonNullAssertion: <>
 	connectionString: process.env.DATABASE_URL!,
 });
 
