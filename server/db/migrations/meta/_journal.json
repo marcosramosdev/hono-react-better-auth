@@ -8,6 +8,13 @@
       "when": 1774624650191,
       "tag": "0000_lowly_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774785314085,
+      "tag": "0001_known_darkstar",
+      "breakpoints": true
     }
   ]
 }

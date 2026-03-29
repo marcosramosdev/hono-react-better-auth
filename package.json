@@ -9,12 +9,14 @@
 		"db:migrate": "bunx drizzle-kit migrate",
 		"db:push": "bunx drizzle-kit push",
 		"db:studio": "bunx drizzle-kit studio",
-		"db:seed": "bun run scripts/seed-local-db.script.ts"
+		"db:seed": "bun run scripts/seed-local-db.script.ts",
+		"open-auth-docs": "open-cli http://localhost:3000/api/auth/reference#description/introduction"
 	},
 	"dependencies": {
 		"better-auth": "^1.5.6",
 		"drizzle-orm": "^0.45.1",
 		"hono": "^4.12.9",
+		"open-cli": "^9.0.0",
 		"pg": "^8.20.0"
 	},
 	"devDependencies": {
