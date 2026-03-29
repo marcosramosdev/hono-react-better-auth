@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { hc } from "hono/client";
 import { CircleX } from "lucide-react";
 import type { AppType } from "../../../server/index";
+import { authClient } from "../lib/auth-client";
 
 const client = hc<AppType>("/");
 
@@ -11,6 +12,28 @@ export const Route = createFileRoute("/todos")({
 });
 
 function RouteComponent() {
+	const { data: session, isPending: isUserPending } = authClient.useSession();
+
+	console.log("session", session, isUserPending);
+
+	if (isUserPending) {
+		return <div>Loading...</div>;
+	}
+
+	if (!session) {
+		return (
+			<div className="text-center text-2xl flex items-center gap-2 justify-center flex-col">
+				<div className="flex items-center gap-2">
+					<p>You need to be logged in to see your todos </p>
+					<CircleX size={30} color="red" />
+				</div>
+				<Link to="/signup" className="link text-accent">
+					Click here to create an account or login if you already have one
+				</Link>
+			</div>
+		);
+	}
+
 	const {
 		data: todos,
 		isPending,
@@ -67,7 +90,7 @@ function RouteComponent() {
 	};
 
 	return (
-		<div className="max-w-xl mx-auto">
+		<div>
 			<div className="mb-5 ">
 				<h1 className="text-center uppercase text-2xl md:text-3xl font-bold tracking-wider">
 					Todos Page

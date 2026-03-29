@@ -12,6 +12,8 @@ export const auth = betterAuth({
 	}),
 	emailAndPassword: {
 		enabled: true,
+		autoSignIn: false,
 	},
+
 	trustedOrigins: [process.env.CLIENT_URL!],
 });

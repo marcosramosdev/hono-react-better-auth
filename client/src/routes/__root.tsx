@@ -51,7 +51,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body className="font-sans antialiased wrap-anywhere">
 				<TanStackQueryProvider>
 					<Header />
-					<main className="page-wrap px-4 py-12">{children}</main>
+					<main className="page-wrap px-4 py-12 max-w-xl mx-auto">
+						{children}
+					</main>
 					<TanStackDevtools
 						config={{
 							position: "bottom-right",
