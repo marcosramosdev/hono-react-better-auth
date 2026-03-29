@@ -1,5 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Navigate, useRouter } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	Navigate,
+	useRouter,
+} from "@tanstack/react-router";
 import { LockKeyhole, Mail, User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -152,6 +157,14 @@ function RouteComponent() {
 						<button className="btn btn-primary w-full" type="submit">
 							Sign up now
 						</button>
+					</div>
+					<div>
+						<p className="text-center mt-4">
+							Already have an account?{" "}
+							<Link to="/signin" className="link text-primary">
+								Sign in here.
+							</Link>
+						</p>
 					</div>
 				</div>
 			</form>

@@ -15,25 +15,6 @@ function RouteComponent() {
 	const { data: session, isPending: isUserPending } = authClient.useSession();
 
 	console.log("session", session, isUserPending);
-
-	if (isUserPending) {
-		return <div>Loading...</div>;
-	}
-
-	if (!session) {
-		return (
-			<div className="text-center text-2xl flex items-center gap-2 justify-center flex-col">
-				<div className="flex items-center gap-2">
-					<p>You need to be logged in to see your todos </p>
-					<CircleX size={30} color="red" />
-				</div>
-				<Link to="/signup" className="link text-accent">
-					Click here to create an account or login if you already have one
-				</Link>
-			</div>
-		);
-	}
-
 	const {
 		data: todos,
 		isPending,
@@ -52,6 +33,24 @@ function RouteComponent() {
 			return await res.json();
 		},
 	});
+
+	if (isUserPending) {
+		return <div>Loading...</div>;
+	}
+
+	if (!session) {
+		return (
+			<div className="text-center text-2xl flex items-center gap-2 justify-center flex-col">
+				<div className="flex items-center gap-2">
+					<p>You need to be logged in to see your todos </p>
+					<CircleX size={30} color="red" />
+				</div>
+				<Link to="/signup" className="link text-accent">
+					Click here to create an account or login if you already have one
+				</Link>
+			</div>
+		);
+	}
 
 	if (isError)
 		return (
