@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { hc } from "hono/client";
 import { CircleX } from "lucide-react";
+import TodoForm from "./components/TodoForm";
 import type { AppType } from "../../../server/index";
 import { authClient } from "../lib/auth-client";
 
@@ -14,17 +15,16 @@ export const Route = createFileRoute("/todos")({
 function RouteComponent() {
 	const { data: session, isPending: isUserPending } = authClient.useSession();
 
-	console.log("session", session, isUserPending);
 	const {
 		data: todos,
 		isPending,
 		isError,
 	} = useQuery({
-		queryKey: ["todos"],
+		queryKey: ["todos", session?.user.id],
 		queryFn: async () => {
-			const res = await client.api.todos[":amount"].$get({
+			const res = await client.api.todos.user[":userId"].$get({
 				param: {
-					amount: "5",
+					userId: session?.user.id as string,
 				},
 			});
 			if (!res.ok) {
@@ -94,6 +94,9 @@ function RouteComponent() {
 				<h1 className="text-center uppercase text-2xl md:text-3xl font-bold tracking-wider">
 					Todos Page
 				</h1>
+			</div>
+			<div>
+				<TodoForm />
 			</div>
 			<div>
 				{isPending ? (

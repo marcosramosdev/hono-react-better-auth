@@ -46,7 +46,6 @@ function RouteComponent() {
 
 	const onSubmit = async (formData: SignupData) => {
 		try {
-			console.log(formData);
 			await authClient.signUp.email({
 				name: formData.name,
 				email: formData.email,

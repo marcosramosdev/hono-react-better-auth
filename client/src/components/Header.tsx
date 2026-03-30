@@ -37,6 +37,7 @@ function Header() {
 				<div>
 					<Link to="/signin">Login</Link>
 				</div>
+
 				<div>
 					<button type="button" onClick={handleLogout}>
 						<LogOut />

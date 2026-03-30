@@ -13,6 +13,7 @@
 		"open-auth-docs": "open-cli http://localhost:3000/api/auth/reference#description/introduction"
 	},
 	"dependencies": {
+		"@hono/zod-validator": "^0.7.6",
 		"better-auth": "^1.5.6",
 		"drizzle-orm": "^0.45.1",
 		"hono": "^4.12.9",
