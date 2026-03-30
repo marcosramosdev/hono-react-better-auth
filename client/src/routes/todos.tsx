@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { hc } from "hono/client";
 import { CircleX } from "lucide-react";
-import TodoForm from "./components/TodoForm";
+import TodoForm from "#/components/TodoForm";
 import type { AppType } from "../../../server/index";
 import { authClient } from "../lib/auth-client";
 
