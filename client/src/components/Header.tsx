@@ -10,7 +10,7 @@ function Header() {
 			fetchOptions: {
 				onSuccess: () => {
 					router.navigate({
-						to: "/about",
+						to: "/signin",
 					});
 				},
 			},
