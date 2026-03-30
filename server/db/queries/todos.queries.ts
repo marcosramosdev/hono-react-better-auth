@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../db";
 import { todos } from "../schema";
 
@@ -56,6 +56,51 @@ export const createTodo = async ({
 			.returning();
 
 		return createdTodo;
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+type DeleteTodoInput = {
+	id: string;
+	userId: string;
+};
+
+type UpdateTodoCompleteInput = {
+	id: string;
+	userId: string;
+	complete: boolean;
+};
+
+export const deleteTodo = async ({ id, userId }: DeleteTodoInput) => {
+	try {
+		const [deletedTodo] = await db
+			.delete(todos)
+			.where(and(eq(todos.id, id), eq(todos.userId, userId)))
+			.returning();
+
+		return deletedTodo;
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const updateTodoComplete = async ({
+	id,
+	userId,
+	complete,
+}: UpdateTodoCompleteInput) => {
+	try {
+		const [updatedTodo] = await db
+			.update(todos)
+			.set({
+				complete,
+				updatedAt: new Date(),
+			})
+			.where(and(eq(todos.id, id), eq(todos.userId, userId)))
+			.returning();
+
+		return updatedTodo;
 	} catch (error) {
 		console.error(error);
 	}

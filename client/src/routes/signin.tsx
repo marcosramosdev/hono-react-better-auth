@@ -1,6 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useRouter,
+} from "@tanstack/react-router";
 import { Lock, User } from "lucide-react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { authClient } from "../lib/auth-client";
@@ -14,10 +20,21 @@ type SigninData = z.infer<typeof signinSchema>;
 
 export const Route = createFileRoute("/signin")({
 	component: RouteComponent,
+	beforeLoad: async ({ location }) => {
+		const session = await authClient.getSession();
+		console.log("Session in beforeLoad:", session);
+		if (!session.data?.user) {
+			throw redirect({
+				to: "/signin",
+				search: location.search,
+			});
+		}
+	},
 });
 
 function RouteComponent() {
 	const { data: session, isPending } = authClient.useSession();
+	const [error, setError] = React.useState<string | null>(null);
 	const router = useRouter();
 
 	const {
@@ -40,14 +57,26 @@ function RouteComponent() {
 
 	const handleLogin = async (formData: SigninData) => {
 		try {
-			await authClient.signIn.email({
+			const res = await authClient.signIn.email({
 				email: formData.email,
 				password: formData.password,
 				callbackURL: "/todos",
 			});
+			if (res.error?.message) {
+				throw new Error(res.error.message);
+			}
+			router.navigate({
+				to: "/todos",
+			});
+			alert("Login successful!");
+			setError(null);
 		} catch (error) {
 			console.error("Login failed:", error);
-			alert("Login failed. Please check your credentials and try again.");
+			setError(
+				error instanceof Error
+					? error.message
+					: "Login failed. Please check your credentials and try again",
+			);
 		}
 	};
 
@@ -98,6 +127,8 @@ function RouteComponent() {
 							{errors.password && (
 								<p className="text-error text-sm">{errors.password.message}</p>
 							)}
+
+							{error && <p className="text-error text-sm">{error}</p>}
 						</div>
 
 						<div className="card-actions mt-5">

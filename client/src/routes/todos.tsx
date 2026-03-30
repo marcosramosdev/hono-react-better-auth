@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { hc } from "hono/client";
 import { CircleX } from "lucide-react";
+import React, { useMemo } from "react";
 import TodoForm from "#/components/TodoForm";
+import TodoList from "#/components/TodoList";
 import type { AppType } from "../../../server/index";
 import { authClient } from "../lib/auth-client";
 
@@ -12,14 +14,27 @@ export const Route = createFileRoute("/todos")({
 	component: RouteComponent,
 });
 
+type TodoFilter = "all" | "active" | "completed";
+type Todo = {
+	id: string;
+	userId: string;
+	title: string;
+	description: string | null;
+	complete: boolean | null;
+	createdAt: string | null;
+	updatedAt: string | null;
+};
+
 function RouteComponent() {
 	const { data: session, isPending: isUserPending } = authClient.useSession();
+
+	const [todoFilter, setTodoFilter] = React.useState<TodoFilter>("all");
 
 	const {
 		data: todos,
 		isPending,
 		isError,
-	} = useQuery({
+	} = useQuery<Todo[]>({
 		queryKey: ["todos", session?.user.id],
 		queryFn: async () => {
 			const res = await client.api.todos.user[":userId"].$get({
@@ -30,9 +45,25 @@ function RouteComponent() {
 			if (!res.ok) {
 				throw Error("failed to fetch todos from client");
 			}
-			return await res.json();
+			return res.json();
 		},
+		enabled: !!session?.user.id,
 	});
+
+	const filteredTodos = useMemo(() => {
+		if (!todos) {
+			return [];
+		}
+
+		switch (todoFilter) {
+			case "active":
+				return todos.filter((todo) => !todo.complete);
+			case "completed":
+				return todos.filter((todo) => !!todo.complete);
+			default:
+				return todos;
+		}
+	}, [todoFilter, todos]);
 
 	if (isUserPending) {
 		return <div>Loading...</div>;
@@ -59,35 +90,6 @@ function RouteComponent() {
 			</div>
 		);
 
-	const todoListComponent = () => {
-		return (
-			<ul>
-				{todos?.map((todo) => (
-					<li key={todo.id}>
-						<div className="flex w-full justify-between items-center border-2 mb-2 p-10 rounded-2xl">
-							<div>
-								<p
-									className={`uppercase ${todo.complete ? "line-through" : ""} `}
-								>
-									{todo.title}
-								</p>
-								<p className="text-base-content">{todo.description}</p>
-							</div>
-							<div>
-								<input
-									type="checkbox"
-									checked={todo.complete as boolean}
-									className="checkbox"
-									onChange={() => console.log("checked")}
-								/>
-							</div>
-						</div>
-					</li>
-				))}
-			</ul>
-		);
-	};
-
 	return (
 		<div>
 			<div className="mb-5 ">
@@ -97,6 +99,29 @@ function RouteComponent() {
 			</div>
 			<div>
 				<TodoForm />
+				<div className="w-full flex justify-between border-2 p-2 mb-5 rounded-2xl">
+					<button
+						className={`${todoFilter === "all" && "font-bold bg-accent text-accent-content"}  rounded-lg px-3 py-1`}
+						onClick={() => setTodoFilter("all")}
+						type="button"
+					>
+						All
+					</button>
+					<button
+						className={`${todoFilter === "active" && "font-bold bg-accent text-accent-content rounded-lg px-3 py-1"}`}
+						onClick={() => setTodoFilter("active")}
+						type="button"
+					>
+						Active
+					</button>
+					<button
+						className={`${todoFilter === "completed" && "font-bold bg-accent text-accent-content rounded-lg px-3 py-1"}`}
+						onClick={() => setTodoFilter("completed")}
+						type="button"
+					>
+						Completed
+					</button>
+				</div>
 			</div>
 			<div>
 				{isPending ? (
@@ -104,7 +129,7 @@ function RouteComponent() {
 						<span className="loading loading-spinner loading-xl"></span>
 					</div>
 				) : (
-					todoListComponent()
+					<TodoList todos={filteredTodos} />
 				)}
 			</div>
 		</div>
