@@ -16,6 +16,7 @@ export async function authMiddleware(c: Context, next: Next) {
 	}
 
 	c.set("user", session);
+	c.set("session", session.session);
 
 	await next();
 }

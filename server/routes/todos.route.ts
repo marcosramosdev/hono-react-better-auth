@@ -7,18 +7,9 @@ import {
 	getTodos,
 } from "../db/queries/todos.queries";
 import { authMiddleware } from "../middleware/authMiddleware";
+import type { HonoEnv } from "../types";
 
-type Env = {
-	Variables: {
-		user: {
-			user: {
-				id: string;
-			};
-		};
-	};
-};
-
-export const todosRoute = new Hono<Env>()
+export const todosRoute = new Hono<HonoEnv>()
 	.get("/", async (c) => {
 		try {
 			const res = await getTodos();
