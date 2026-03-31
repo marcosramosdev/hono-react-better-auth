@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { hc } from "hono/client";
 import { CircleX } from "lucide-react";
 import React, { useMemo } from "react";
@@ -33,6 +33,7 @@ function RouteComponent() {
 
 	const [todoFilter, setTodoFilter] = React.useState<TodoFilter>("all");
 
+	// o enable do usequery desabilita o fetch automatico quando eu não tenho o userId, dessa forma que posso rodar o query de forma condicional e evitar erros de fetch por conta do userId ser undefined
 	const {
 		data: todos,
 		isPending,
@@ -68,6 +69,23 @@ function RouteComponent() {
 				return todos;
 		}
 	}, [todoFilter, todos]);
+
+	if (!userId) {
+		return (
+			<div className="text-center text-2xl flex flex-col items-center gap-2 justify-center">
+				<p>Please log in to view your todos</p>
+				<div className="flex items-center gap-2">
+					<Link to="/signin" className="link text-accent">
+						sign in
+					</Link>
+					<span>/</span>
+					<Link to="/signup" className="link text-accent">
+						sign up
+					</Link>
+				</div>
+			</div>
+		);
+	}
 
 	if (isPending) {
 		return <div>Loading...</div>;
