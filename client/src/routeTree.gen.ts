@@ -9,17 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TodosRouteImport } from './routes/todos'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as _authenticatedRouteImport } from './routes/__authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as _authenticatedTodosRouteImport } from './routes/__authenticated/todos'
 
-const TodosRoute = TodosRouteImport.update({
-  id: '/todos',
-  path: '/todos',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -35,10 +31,19 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const _authenticatedRoute = _authenticatedRouteImport.update({
+  id: '/__authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const _authenticatedTodosRoute = _authenticatedTodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
+  getParentRoute: () => _authenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -46,48 +51,49 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
-  '/todos': typeof TodosRoute
+  '/todos': typeof _authenticatedTodosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
-  '/todos': typeof TodosRoute
+  '/todos': typeof _authenticatedTodosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/__authenticated': typeof _authenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
-  '/todos': typeof TodosRoute
+  '/__authenticated/todos': typeof _authenticatedTodosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/about' | '/signin' | '/signup' | '/todos'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/about' | '/signin' | '/signup' | '/todos'
-  id: '__root__' | '/' | '/about' | '/signin' | '/signup' | '/todos'
+  id:
+    | '__root__'
+    | '/'
+    | '/__authenticated'
+    | '/about'
+    | '/signin'
+    | '/signup'
+    | '/__authenticated/todos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  _authenticatedRoute: typeof _authenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
-  TodosRoute: typeof TodosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/todos': {
-      id: '/todos'
-      path: '/todos'
-      fullPath: '/todos'
-      preLoaderRoute: typeof TodosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -109,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/__authenticated': {
+      id: '/__authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof _authenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -116,15 +129,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/__authenticated/todos': {
+      id: '/__authenticated/todos'
+      path: '/todos'
+      fullPath: '/todos'
+      preLoaderRoute: typeof _authenticatedTodosRouteImport
+      parentRoute: typeof _authenticatedRoute
+    }
   }
 }
 
+interface _authenticatedRouteChildren {
+  _authenticatedTodosRoute: typeof _authenticatedTodosRoute
+}
+
+const _authenticatedRouteChildren: _authenticatedRouteChildren = {
+  _authenticatedTodosRoute: _authenticatedTodosRoute,
+}
+
+const _authenticatedRouteWithChildren = _authenticatedRoute._addFileChildren(
+  _authenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  _authenticatedRoute: _authenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
-  TodosRoute: TodosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -15,6 +15,9 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
+			"style": {
+				"noNonNullAssertion": "info"
+			},
 			"recommended": true,
 			"a11y": {
 				"useButtonType": "off"

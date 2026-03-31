@@ -1,10 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	createFileRoute,
-	Link,
-	redirect,
-	useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Lock, User } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -12,24 +7,15 @@ import z from "zod";
 import { authClient } from "../lib/auth-client";
 
 const signinSchema = z.object({
-	email: z.string().email("Invalid Email"),
-	password: z.string().min(8, "Invalid Password"),
+	name: z.string().optional(),
+	email: z.string().email("Please enter a valid email address"),
+	password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 type SigninData = z.infer<typeof signinSchema>;
 
 export const Route = createFileRoute("/signin")({
 	component: RouteComponent,
-	beforeLoad: async ({ location }) => {
-		const session = await authClient.getSession();
-		console.log("Session in beforeLoad:", session);
-		if (!session.data?.user) {
-			throw redirect({
-				to: "/signin",
-				search: location.search,
-			});
-		}
-	},
 });
 
 function RouteComponent() {
@@ -38,9 +24,9 @@ function RouteComponent() {
 	const router = useRouter();
 
 	const {
+		formState: { errors },
 		register,
 		handleSubmit,
-		formState: { errors },
 	} = useForm<SigninData>({
 		resolver: zodResolver(signinSchema),
 	});

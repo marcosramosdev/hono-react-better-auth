@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { hc } from "hono/client";
 import { CircleX } from "lucide-react";
 import React, { useMemo } from "react";
 import TodoForm from "#/components/TodoForm";
 import TodoList from "#/components/TodoList";
-import type { AppType } from "../../../server/index";
-import { authClient } from "../lib/auth-client";
+import type { AppType } from "../../../../server/index";
 
 const client = hc<AppType>("/");
 
-export const Route = createFileRoute("/todos")({
+export const Route = createFileRoute("/__authenticated/todos")({
 	component: RouteComponent,
 });
 
@@ -26,7 +25,11 @@ type Todo = {
 };
 
 function RouteComponent() {
-	const { data: session, isPending: isUserPending } = authClient.useSession();
+	const session = Route.useRouteContext({
+		select: (ctx) => ctx.session,
+	});
+
+	const userId = session?.data?.user.id;
 
 	const [todoFilter, setTodoFilter] = React.useState<TodoFilter>("all");
 
@@ -35,11 +38,11 @@ function RouteComponent() {
 		isPending,
 		isError,
 	} = useQuery<Todo[]>({
-		queryKey: ["todos", session?.user.id],
+		queryKey: ["todos", userId],
 		queryFn: async () => {
 			const res = await client.api.todos.user[":userId"].$get({
 				param: {
-					userId: session?.user.id as string,
+					userId: userId as string,
 				},
 			});
 			if (!res.ok) {
@@ -47,7 +50,7 @@ function RouteComponent() {
 			}
 			return res.json();
 		},
-		enabled: !!session?.user.id,
+		enabled: !!userId,
 	});
 
 	const filteredTodos = useMemo(() => {
@@ -65,22 +68,8 @@ function RouteComponent() {
 		}
 	}, [todoFilter, todos]);
 
-	if (isUserPending) {
+	if (isPending) {
 		return <div>Loading...</div>;
-	}
-
-	if (!session) {
-		return (
-			<div className="text-center text-2xl flex items-center gap-2 justify-center flex-col">
-				<div className="flex items-center gap-2">
-					<p>You need to be logged in to see your todos </p>
-					<CircleX size={30} color="red" />
-				</div>
-				<Link to="/signup" className="link text-accent">
-					Click here to create an account or login if you already have one
-				</Link>
-			</div>
-		);
 	}
 
 	if (isError)
