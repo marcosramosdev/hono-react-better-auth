@@ -47,7 +47,6 @@ function RouteComponent() {
 			const res = await authClient.signIn.email({
 				email: formData.email,
 				password: formData.password,
-				callbackURL: "/todos",
 			});
 			if (res.error?.message) {
 				throw new Error(res.error.message);
@@ -55,7 +54,7 @@ function RouteComponent() {
 			router.navigate({
 				to: "/todos",
 			});
-			alert("Login successful!");
+
 			setError(null);
 		} catch (error) {
 			console.error("Login failed:", error);
