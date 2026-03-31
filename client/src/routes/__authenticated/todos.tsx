@@ -45,6 +45,7 @@ function RouteComponent() {
 					userId: userId as string,
 				},
 			});
+
 			if (!res.ok) {
 				throw Error("failed to fetch todos from client");
 			}

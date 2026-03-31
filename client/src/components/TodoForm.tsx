@@ -96,8 +96,8 @@ function TodoForm() {
 						</label>
 					</div>
 
-					<div className="card-actions justify-end">
-						<button className="btn btn-primary" type="submit">
+					<div className="card-actions justify-center">
+						<button className="btn btn-primary btn-wide" type="submit">
 							Add todo
 						</button>
 					</div>

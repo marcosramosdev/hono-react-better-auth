@@ -4,7 +4,7 @@ import { Lock, User } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { authClient } from "../lib/auth-client";
+import { authClient, getSessionSafe } from "../lib/auth-client";
 
 const signinSchema = z.object({
 	name: z.string().optional(),
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/signin")({
 
 function RouteComponent() {
 	const { data: session, isPending } = authClient.useSession();
+
 	const [error, setError] = React.useState<string | null>(null);
 	const router = useRouter();
 
